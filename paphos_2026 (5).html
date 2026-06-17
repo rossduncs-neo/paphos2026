@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paphos 2026 — Field Guide</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #1a1a1a; }
+  :root {
+    --ink: #1a1a1a; --muted: #555; --hint: #999;
+    --surface: #fff; --lifted: #f5f4f0;
+    --border: rgba(0,0,0,0.12); --border-mid: rgba(0,0,0,0.22);
+    --cy-gold: #C9922A; --cy-sea: #185FA5; --cy-terr: #993C1D;
+    --radius-md: 8px; --radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink: #f0ede8; --muted: #aaa; --hint: #666; --surface: #1c1c1e; --lifted: #2a2a2c; --border: rgba(255,255,255,0.1); --border-mid: rgba(255,255,255,0.2); }
+    body { background: #111; }
+    .tag-gold { background: #3d2e10 !important; color: #e8b860 !important; }
+    .tag-sea { background: #0a2540 !important; color: #7eb8f7 !important; }
+    .tag-terr { background: #3a1810 !important; color: #e8a080 !important; }
+    .tag-green { background: #0f2a10 !important; color: #7ed87e !important; }
+    .tag-gray { background: #2a2a2c !important; color: #aaa !important; }
+    .phrase-warning { background: #3a1810 !important; color: #e8a080 !important; }
+    .phrase-safe { background: #0f2a10 !important; color: #7ed87e !important; }
+    .rule-block { background: #2a2a2c !important; }
+    .decision-wrap { background: #2a2a2c !important; }
+    .venue-rating span { color: #e8b860 !important; }
+  }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 0 0 3rem; }
+
+  /* HERO */
+  .hero { padding: 2rem 1.25rem 1.5rem; border-bottom: 0.5px solid var(--border); }
+  .hero-eyebrow { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--cy-gold); font-weight: 600; margin-bottom: 0.5rem; }
+  .hero-title { font-size: 28px; font-weight: 500; color: var(--ink); line-height: 1.15; margin-bottom: 0.4rem; }
+  .hero-sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .hero-meta { display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; }
+  .meta-pill { font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--border-mid); color: var(--muted); }
+
+  /* TABS */
+  .tabs { display: flex; overflow-x: auto; border-bottom: 0.5px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 10; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; padding: 0.75rem 0.9rem; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; border: none; border-bottom: 2px solid transparent; background: none; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
+  .tab.active { color: var(--cy-gold); border-bottom-color: var(--cy-gold); }
+
+  /* SECTIONS */
+  .section { display: none; padding: 1.5rem 1.25rem; }
+  .section.active { display: block; }
+  .section-label { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cy-gold); font-weight: 600; margin-bottom: 0.75rem; }
+  .section-title { font-size: 20px; font-weight: 500; color: var(--ink); margin-bottom: 0.75rem; line-height: 1.2; }
+  .prose { font-size: 14px; color: var(--muted); line-height: 1.75; margin-bottom: 1rem; }
+  .prose em { color: var(--ink); font-style: normal; font-weight: 500; }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.125rem; margin-bottom: 0.75rem; }
+  .card-title { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 0.35rem; }
+  .card-body { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .card-tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px; margin-bottom: 0.5rem; font-weight: 600; }
+  .tag-gold { background: #FFF3DC; color: #7A540E; }
+  .tag-sea { background: #E6F1FB; color: #0C447C; }
+  .tag-terr { background: #FAECE7; color: #712B13; }
+  .tag-green { background: #EAF3DE; color: #27500A; }
+  .tag-gray { background: #f0ede8; color: #666; }
+
+  /* VENUE CARDS */
+  .venue-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.125rem; margin-bottom: 0.75rem; }
+  .venue-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; }
+  .venue-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .venue-rating { font-size: 12px; color: #C9922A; letter-spacing: 0.05em; }
+  .venue-meta { font-size: 11px; color: var(--hint); margin-bottom: 0.5rem; }
+  .venue-body { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .venue-verdict { font-size: 12px; color: var(--ink); font-weight: 500; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 0.5px solid var(--border); font-style: italic; }
+
+  /* SUB-TABS (for bars/restaurants) */
+  .sub-tabs { display: flex; gap: 6px; margin-bottom: 1rem; }
+  .sub-tab { font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 0.5px solid var(--border-mid); color: var(--muted); background: none; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+  .sub-tab.active { background: var(--cy-gold); color: #fff; border-color: var(--cy-gold); }
+  .sub-panel { display: none; }
+  .sub-panel.active { display: block; }
+
+  /* DAY TABS */
+  .day-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .day-btn { font-size: 11px; padding: 5px 10px; border-radius: 20px; border: 0.5px solid var(--border-mid); color: var(--muted); background: none; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+  .day-btn.active { background: var(--cy-gold); color: #fff; border-color: var(--cy-gold); }
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  /* TIMELINE */
+  .tl-item { display: flex; gap: 12px; margin-bottom: 1.25rem; }
+  .tl-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 44px; }
+  .tl-time { font-size: 10px; font-weight: 600; color: var(--cy-gold); text-align: center; line-height: 1.2; margin-bottom: 4px; }
+  .tl-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-mid); flex-shrink: 0; }
+  .tl-dot.gold { background: var(--cy-gold); }
+  .tl-line { width: 1px; flex: 1; background: var(--border); margin-top: 4px; }
+  .tl-content { flex: 1; }
+  .tl-heading { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+  .tl-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .tl-aside { font-size: 11px; color: var(--hint); font-style: italic; margin-top: 3px; }
+
+  /* PHRASEBOOK */
+  .phrase-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.125rem; margin-bottom: 0.75rem; cursor: pointer; transition: border-color 0.15s; }
+  .phrase-card:hover { border-color: var(--border-mid); }
+  .phrase-card.open { border-color: var(--cy-gold); }
+  .phrase-greek { font-size: 18px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+  .phrase-phonetic { font-size: 13px; color: var(--cy-gold); font-weight: 600; margin-bottom: 2px; }
+  .phrase-brit { font-size: 11px; color: var(--hint); margin-bottom: 0.4rem; font-style: italic; }
+  .phrase-meaning { font-size: 13px; color: var(--ink); font-weight: 500; }
+  .phrase-detail { display: none; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 0.5px solid var(--border); font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .phrase-card.open .phrase-detail { display: block; }
+  .phrase-warning { background: #FAECE7; color: #712B13; font-size: 11px; padding: 4px 10px; border-radius: 6px; margin-top: 8px; display: inline-block; font-weight: 600; }
+  .phrase-safe { background: #EAF3DE; color: #27500A; font-size: 11px; padding: 4px 10px; border-radius: 6px; margin-top: 8px; display: inline-block; font-weight: 600; }
+
+  /* DECIDER */
+  .decision-wrap { background: var(--lifted); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+  .decision-q { font-size: 13px; color: var(--muted); margin-bottom: 0.75rem; }
+  .decision-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+  .decision-opt { font-size: 12px; padding: 8px 10px; border-radius: var(--radius-md); border: 0.5px solid var(--border-mid); background: var(--surface); cursor: pointer; color: var(--ink); text-align: left; transition: all 0.15s; }
+  .decision-opt:hover { border-color: var(--cy-gold); color: var(--cy-gold); }
+  .decision-output { font-size: 13px; color: var(--ink); line-height: 1.7; min-height: 60px; padding: 0.75rem 1rem; background: var(--surface); border-radius: var(--radius-md); border: 0.5px solid var(--border); }
+
+  /* ARCHETYPES */
+  .archetype { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.125rem; margin-bottom: 0.75rem; }
+  .arch-role { font-size: 11px; color: var(--cy-gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+  .arch-name { font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 0.4rem; }
+  .arch-body { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .arch-quote { font-size: 12px; color: var(--hint); font-style: italic; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 0.5px solid var(--border); }
+
+  .rule-block { border-left: 2px solid var(--cy-gold); padding: 0.75rem 1rem; margin: 1rem 0; background: var(--lifted); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+  .rule-block p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .divider { border: none; border-top: 0.5px solid var(--border); margin: 1.25rem 0; }
+  .footer { text-align: center; padding: 1.5rem 1.25rem; font-size: 11px; color: var(--hint); border-top: 0.5px solid var(--border); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-eyebrow">Cyprus · June 2026</div>
+    <div class="hero-title">Paphos 2026</div>
+    <div class="hero-sub">A field guide for nine men who are, individually, very organised.</div>
+    <div class="hero-meta">
+      <span class="meta-pill">7 days</span>
+      <span class="meta-pill">9 men</span>
+      <span class="meta-pill">1 villa</span>
+      <span class="meta-pill">∞ indecision</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showSection('itinerary')">Itinerary</button>
+    <button class="tab" onclick="showSection('rhythm')">Daily rhythm</button>
+    <button class="tab" onclick="showSection('venues')">Where to go</button>
+    <button class="tab" onclick="showSection('map')">Map</button>
+    <button class="tab" onclick="showSection('football')">Football</button>
+    <button class="tab" onclick="showSection('phrases')">Phrasebook</button>
+    <button class="tab" onclick="showSection('archetypes')">The group</button>
+    <button class="tab" onclick="showSection('decide')">Decider</button>
+  </div>
+
+  <!-- ITINERARY -->
+  <div class="section active" id="section-itinerary">
+    <div class="section-label">Day by day</div>
+    <div class="section-title">What's actually happening</div>
+    <div class="prose">Nothing is fixed. Everything is subject to weather, mood, and whoever slept best.</div>
+    <div class="day-tabs">
+      <button class="day-btn active" onclick="showDay(1)">Wed 17</button>
+      <button class="day-btn" onclick="showDay(2)">Thu 18</button>
+      <button class="day-btn" onclick="showDay(3)">Fri 19</button>
+      <button class="day-btn" onclick="showDay(4)">Sat 20</button>
+      <button class="day-btn" onclick="showDay(5)">Sun 21</button>
+      <button class="day-btn" onclick="showDay(6)">Mon 22</button>
+      <button class="day-btn" onclick="showDay(7)">Tue 23</button>
+    </div>
+
+    <div class="day-panel active" id="day-1">
+      <span class="card-tag tag-gold">Arrival</span>
+      <div class="card-title" style="font-size:15px;margin-bottom:0.5rem;">Day 1 — Land, stock up, settle in</div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">Aft</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Arrive & stock the villa</div><div class="tl-note">Beer, water, breakfast basics. First argument about whether to buy wine or use the local shop daily. The shop wins by Day 3.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">5pm</div><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Pool & first beer</div><div class="tl-note">Nobody declared their intention to drink today. It happens anyway.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">7pm</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Seafront walk</div><div class="tl-note">Paphos promenade. Short. Everyone learns where the harbour is, which is the only geography that matters.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">8:30</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Meze dinner — Laona Restaurant</div><div class="tl-note">Family-run Old Town institution. Rabbit stew, meatballs, slow-cooked everything. The kind of place you go back to without planning to.</div><div class="tl-aside">Book ahead. They fill up.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">Late</div><div class="tl-dot"></div></div><div class="tl-content"><div class="tl-heading">Harbour drinks, then sleep</div><div class="tl-note">Arrival night. Keep it easy. One drink at the harbour. Nobody agrees on this. It works out.</div></div></div>
+    </div>
+
+    <div class="day-panel" id="day-2">
+      <span class="card-tag tag-sea">Beach day</span>
+      <div class="card-title" style="font-size:15px;margin-bottom:0.5rem;">Day 2 — Coral Bay & first proper night</div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">10am</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Coral Bay</div><div class="tl-note">Best easy beach near Paphos. Sunbeds, swimming, cold Keo. No ambition required or permitted.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">2pm</div><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Beach taverna lunch</div><div class="tl-note">Grilled halloumi. Souvlaki. Cold beer. In that order, repeated.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">5pm</div><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Villa recovery</div><div class="tl-note">Pool, nap, shower. The villa earns its keep.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">8pm</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Dinner — Mandra Tavern, Old Town</div><div class="tl-note">Hidden gem. Stone walls, garden courtyard, ingredients from the owner's Troodos farm. Go before the tourists find it.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">Late</div><div class="tl-dot gold"></div></div><div class="tl-content"><div class="tl-heading">First proper night — Keg & Barrel then Bar Street</div><div class="tl-note">Keg & Barrel for warm-up pints, then wherever the evening goes. This is the first real one. Nobody will remember who suggested it.</div></div></div>
+    </div>
+
+    <div class="day-panel" id="day-3">
+      <span class="card-tag tag-gray">Culture day</span>
+      <div class="card-title" style="font-size:15px;margin-bottom:0.5rem;">Day 3 — The Cultural Reset</div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">10am</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Tombs of the Kings</div><div class="tl-note">UNESCO site. Genuinely impressive. Takes about an hour. Nobody expected to enjoy it. Everyone does.</div><div class="tl-aside">Hat and water. Non-negotiable.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">12pm</div><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Long taverna lunch</div><div class="tl-note">Slow. No decisions. Let someone else order. It will be fine.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">3pm</div><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Siesta — mandatory</div><div class="tl-note">Not a suggestion.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">Eve</div><div class="tl-dot gold"></div></div><div class="tl-content"><div class="tl-heading">BBQ at the villa + Rum & Jam nightcap</div><div class="tl-note">Villa BBQ with wine from the local shop. If anyone still has legs by 10pm, Rum & Jam in Old Town is a ten-minute taxi.</div></div></div>
+    </div>
+
+    <div class="day-panel" id="day-4">
+      <span class="card-tag tag-terr">Adventure</span>
+      <div class="card-title" style="font-size:15px;margin-bottom:0.5rem;">Day 4 — The Akamas Peninsula</div>
+      <div class="rule-block"><p>Book in advance. The one non-negotiable logistical act of the week.</p></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">9am</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Jeep safari — Akamas</div><div class="tl-note">Off-road through the peninsula. Lara Beach (turtle nesting). Blue Lagoon swim. Spectacular, effortless — someone else drives.</div><div class="tl-aside">Alternative: half-day boat trip from the harbour.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">3pm</div><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Return & recover</div><div class="tl-note">Tired. At least two people mildly sunburned. Satisfied.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">8pm</div><div class="tl-dot gold"></div></div><div class="tl-content"><div class="tl-heading">Big group dinner — 7 St. Georges Tavern</div><div class="tl-note">No menu. No wine list. Owner just starts bringing food — 20+ dishes over two hours. Book in advance and get there on time. One sitting per night.</div><div class="tl-aside">In Yeroskipou village, 10 mins from Paphos. Worth every penny of the taxi.</div></div></div>
+    </div>
+
+    <div class="day-panel" id="day-5">
+      <span class="card-tag tag-gold">Wine country</span>
+      <div class="card-title" style="font-size:15px;margin-bottom:0.5rem;">Day 5 — Villages & Wine</div>
+      <div class="rule-block"><p>Usually becomes the group favourite. Breaks the beach-and-bar cycle without anyone noticing that's why it works.</p></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">10am</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Drive into the Troodos foothills</div><div class="tl-note">Scenic. Cooler. Completely different from everything else this week.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">12pm</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Village taverna lunch</div><div class="tl-note">Mountain food. Local wine. No rush. Often the best meal of the trip and the cheapest.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">3pm</div><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Winery stop(s)</div><div class="tl-note">Maratheftiko grape. Commandaria. Taste, buy, slightly overspend. Worth it.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">Eve</div><div class="tl-dot"></div></div><div class="tl-content"><div class="tl-heading">Back to Paphos — easy night</div><div class="tl-note">Villa drinks with whatever wine survived the drive. Correct.</div></div></div>
+    </div>
+
+    <div class="day-panel" id="day-6">
+      <span class="card-tag tag-terr">Final night</span>
+      <div class="card-title" style="font-size:15px;margin-bottom:0.5rem;">Day 6 — Farewell, properly</div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">Morn</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Final beach session</div><div class="tl-note">Coral Bay again, or water sports. Optional jet ski. Mandatory paddleboard struggle.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">4pm</div><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Villa afternoon</div><div class="tl-note">Pool. Recovery beers. Quietly prepare for the evening without saying so.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">8pm</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Farewell dinner — harbour seafood</div><div class="tl-note">Somewhere by the water. Book a table. Dress slightly better than the rest of the week. Nobody will mention this was agreed.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">Late</div><div class="tl-dot gold"></div></div><div class="tl-content"><div class="tl-heading">Final night out</div><div class="tl-note">Best bars of the week, revisited. Everyone agrees on this one for the first time all week.</div></div></div>
+    </div>
+
+    <div class="day-panel" id="day-7">
+      <span class="card-tag tag-gray">Departure</span>
+      <div class="card-title" style="font-size:15px;margin-bottom:0.5rem;">Day 7 — Survival mode</div>
+      <div class="rule-block"><p>No plans. No pressure. If someone suggests something ambitious, they are overruled by consensus for the first and only time all week.</p></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">Late</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Harbour brunch</div><div class="tl-note">Coffee. Eggs. Possibly a Bloody Mary. Nobody judges.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">Noon</div><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Final seafront walk</div><div class="tl-note">Short. Reflective. Someone will say "we should do this every year." He has said this every year.</div></div></div>
+      <div class="tl-item"><div class="tl-left"><div class="tl-time">Aft</div><div class="tl-dot gold"></div></div><div class="tl-content"><div class="tl-heading">Pack & airport</div><div class="tl-note">Someone has already packed. Someone has not started.</div></div></div>
+    </div>
+  </div>
+
+  <!-- DAILY RHYTHM -->
+  <div class="section" id="section-rhythm">
+    <div class="section-label">The pattern</div>
+    <div class="section-title">Daily rhythm</div>
+    <div class="prose">This repeats with minor variation for seven days. The variation is mostly in the level of self-awareness about what's happening.</div>
+    <div class="tl-item"><div class="tl-left"><div class="tl-time">8–11</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Morning — optimism</div><div class="tl-note">Coffee. Recovery. Quiet. Someone says "I'm not drinking today." This is received without comment.</div><div class="tl-aside">The group functions best before anyone has made a decision about anything.</div></div></div>
+    <div class="tl-item"><div class="tl-left"><div class="tl-time">11–4</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Midday — the golden window</div><div class="tl-note">Pool. Sun. Lunch. Beer appears. Football debate begins. The group is at peak contentment: warm, fed, opinions not yet hardened.</div><div class="tl-aside">This is when the villa earns its money.</div></div></div>
+    <div class="tl-item"><div class="tl-left"><div class="tl-time">4–7</div><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Late afternoon — the drift</div><div class="tl-note">Shower. Reset. Vague planning. "We should sort dinner" is said. Nothing is sorted. Plans drift toward the first suggestion made 40 minutes ago.</div><div class="tl-aside">This is not a failure. It is the process.</div></div></div>
+    <div class="tl-item"><div class="tl-left"><div class="tl-time">7–10</div><div class="tl-dot gold"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-heading">Evening — dinner + football</div><div class="tl-note">Food. Wine. Match if there is one. Match analysis if there isn't. The evening organises itself around these two anchors.</div></div></div>
+    <div class="tl-item"><div class="tl-left"><div class="tl-time">10+</div><div class="tl-dot"></div></div><div class="tl-content"><div class="tl-heading">Late — "one more"</div><div class="tl-note">The phrase "one more" is used. It is sincere each time.</div><div class="tl-aside">Harbour (default) → Old Town (smart night) → Bar Street (optional chaos, limited exposure).</div></div></div>
+    <hr class="divider">
+    <div class="rule-block"><p>The <em>Dinner Problem</em> occurs daily at approximately 6:30pm. Nine intelligent men will fail to converge on a restaurant in under 20 minutes. The destination is always the first place suggested. This is not irony. It is physics.</p></div>
+  </div>
+
+  <!-- WHERE TO GO -->
+  <div class="section" id="section-venues">
+    <div class="section-label">Bars & restaurants</div>
+    <div class="section-title">Where to actually go</div>
+    <div class="prose">Curated. Not TripAdvisor's top ten. These are the places worth the taxi fare.</div>
+
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="showSubPanel('restaurants')">Restaurants</button>
+      <button class="sub-tab" onclick="showSubPanel('bars')">Bars</button>
+      <button class="sub-tab" onclick="showSubPanel('zones')">Night zones</button>
+    </div>
+
+    <div class="sub-panel active" id="sub-restaurants">
+
+      <div class="venue-card">
+        <div class="card-tag tag-gold">The one to book first</div>
+        <div class="venue-header">
+          <div class="venue-name">7 St. Georges Tavern</div>
+          <div class="venue-rating">★★★★★</div>
+        </div>
+        <div class="venue-meta">Yeroskipou village · 10 min taxi · Book in advance · One sitting per night</div>
+        <div class="venue-body">No menu. No wine list. You sit down and the owner starts bringing food. Twenty-odd dishes over two hours — homegrown olives, kleftiko, wild greens, cheese pies, lamb, things you can't name but will eat anyway. Organic ingredients from their own farm. Homemade wine at €10 a litre. Absurdly good value.</div>
+        <div class="venue-verdict">Do not miss this. It is the dinner of the trip. Book before you land.</div>
+      </div>
+
+      <div class="venue-card">
+        <div class="card-tag tag-terr">Old Town gem</div>
+        <div class="venue-header">
+          <div class="venue-name">Laona Restaurant</div>
+          <div class="venue-rating">★★★★★</div>
+        </div>
+        <div class="venue-meta">Paphos Old Town · Family-run · Locals eat here</div>
+        <div class="venue-body">The kind of place that has no reason to try hard because it doesn't need to. Rabbit stew, meatballs, hearty stews made from whatever arrived that morning. Warm, slightly chaotic, genuinely Cypriot. Multiple groups have gone three times in one trip. That tells you everything.</div>
+        <div class="venue-verdict">Go on a night when nobody can agree on anything. It solves the problem.</div>
+      </div>
+
+      <div class="venue-card">
+        <div class="card-tag tag-gray">Hidden local</div>
+        <div class="venue-header">
+          <div class="venue-name">Mandra Tavern</div>
+          <div class="venue-rating">★★★★★</div>
+        </div>
+        <div class="venue-meta">Paphos Old Town · Stone walls + garden courtyard · Arrive before 7pm</div>
+        <div class="venue-body">Rustic. Tucked away from the main drag. Ingredients from the owner's family farm in the Troodos. Village-style grilled meats, seasonal vegetables, courtyard dining. The kind of place that appears in travel writing and then gets busy. Currently still manageable.</div>
+        <div class="venue-verdict">Best for: the evening nobody planned. Show up. Eat extremely well.</div>
+      </div>
+
+      <div class="venue-card">
+        <div class="card-tag tag-sea">Worth the trip</div>
+        <div class="venue-header">
+          <div class="venue-name">To Eklekton Cypriot Corner</div>
+          <div class="venue-rating">★★★★★</div>
+        </div>
+        <div class="venue-meta">Off the tourist trail · Open until 3am · Locals only, basically</div>
+        <div class="venue-body">Popular with locals, overlooked by tourists — the combination that makes a restaurant worth finding. Meze, lamb, keftedes, lemon chicken soup, house wine. Generous portions, reasonable prices, late kitchen. If you find yourselves hungry at midnight, this is the answer.</div>
+        <div class="venue-verdict">The backup plan that turns into the favourite.</div>
+      </div>
+
+      <div class="venue-card">
+        <div class="card-tag tag-gold">Beach lunch</div>
+        <div class="venue-header">
+          <div class="venue-name">Coral Bay tavernas</div>
+          <div class="venue-rating">★★★★</div>
+        </div>
+        <div class="venue-meta">Coral Bay · Lunch only · Don't overthink it</div>
+        <div class="venue-body">Several options along the beach. Don't research. Walk in, sit where there's shade, order halloumi, souvlaki, and cold Keo. They're all roughly equivalent. The beach does most of the work.</div>
+        <div class="venue-verdict">Pick one. Any one. This is not the meal you came to Cyprus for.</div>
+      </div>
+
+
+      <div class="venue-card">
+        <div class="card-tag tag-terr">Since 1951</div>
+        <div class="venue-header">
+          <div class="venue-name">Hondros Tavern</div>
+          <div class="venue-rating">★★★★★</div>
+        </div>
+        <div class="venue-meta">Near Paphos Harbour · Open daily noon–10:30pm · Walk from centre</div>
+        <div class="venue-body">The oldest taverna in Paphos. Been going since 1951 and hasn't felt the need to change much, which is the point. Souvlaki cooked on an open charcoal pit as you walk in — you smell it before you see it. Kleftiko, meze, grilled octopus, roast potatoes done properly. Locals eat here. Tourists largely walk past it on the way to somewhere worse.</div>
+        <div class="venue-verdict">One group went twice in four days. That's the review.</div>
+      </div>
+
+      <div class="venue-card">
+        <div class="card-tag tag-gold">Friday & Saturday nights</div>
+        <div class="venue-header">
+          <div class="venue-name">Konia Tavern</div>
+          <div class="venue-rating">★★★★★</div>
+        </div>
+        <div class="venue-meta">Konia village · 10 min taxi · Live music Fri & Sat · Book ahead</div>
+        <div class="venue-body">Ten minutes outside Paphos in Konia village, which is exactly why tourists don't find it. Live band on Fridays and Saturdays — locals dancing, not performing. Twenty-course meze, charcoal-grilled meats, lamb chops, loukoumades to finish. One reviewer said: "the locals are drinking and dancing and genuinely enjoying themselves — this is not a show for tourists." That is the test and this passes it.<br><br>For a group of nine with a Friday or Saturday night free, this is probably the best night of the trip.</div>
+        <div class="venue-verdict">Go on a Friday or Saturday. Book in advance. Take two taxis.</div>
+      </div>
+    </div>
+
+    <div class="sub-panel" id="sub-bars">
+
+      <div class="venue-card">
+        <div class="card-tag tag-gold">Match HQ</div>
+        <div class="venue-header">
+          <div class="venue-name">Keg & Barrel</div>
+          <div class="venue-rating">★★★★★</div>
+        </div>
+        <div class="venue-meta">Agiou Antoniou St · Bar Street entrance · Sports screens · Sponsor of Paphos Tigers RFC</div>
+        <div class="venue-body">Your base of operations for every match. Multiple large screens. Good beer selection. Welcoming to a group of nine men who have opinions about formations. Gets busy for big games — arrive early, claim territory, do not cede it.</div>
+        <div class="venue-verdict">Not a choice. A default state.</div>
+      </div>
+
+      <div class="venue-card">
+        <div class="card-tag tag-gold">Match backup</div>
+        <div class="venue-header">
+          <div class="venue-name">Harry O's</div>
+          <div class="venue-rating">★★★★</div>
+        </div>
+        <div class="venue-meta">Paphos harbour area · Sports bar · Reliable</div>
+        <div class="venue-body">Overflow from Keg & Barrel when seating is full, or preferred some nights depending on the match and the mood. Not a downgrade. The beer is the same. The screens work.</div>
+        <div class="venue-verdict">The plan B that feels like plan A after one pint.</div>
+      </div>
+
+      <div class="venue-card">
+        <div class="card-tag tag-sea">Old Town cocktails</div>
+        <div class="venue-header">
+          <div class="venue-name">Rum & Jam</div>
+          <div class="venue-rating">★★★★★</div>
+        </div>
+        <div class="venue-meta">Old Town alleyway · Small · Cocktail bar · Friendly staff</div>
+        <div class="venue-body">Tucked down a side alley in the Old Town. Super-cool, laid-back atmosphere, genuinely good cocktails. The kind of bar you find by accident and then return to on purpose. Works for a nightcap after dinner or as the start of an Old Town evening.</div>
+        <div class="venue-verdict">The one everyone says they'll go back to. Go back to it.</div>
+      </div>
+
+      <div class="venue-card">
+        <div class="card-tag tag-sea">200 gins. No, really.</div>
+        <div class="venue-header">
+          <div class="venue-name">Ambience Gin House</div>
+          <div class="venue-rating">★★★★</div>
+        </div>
+        <div class="venue-meta">Paphos Old Town · Indoor · Designer interior · Trendy</div>
+        <div class="venue-body">Over 200 gins. This is the bar for the night someone decides the group is having a sophisticated evening. They are right. It works. The lighting is good. Nobody will admit enjoying it quite as much as they do.</div>
+        <div class="venue-verdict">Better than it sounds. Which is saying something, given it sounds excellent.</div>
+      </div>
+
+      <div class="venue-card">
+        <div class="card-tag tag-terr">Sunset views</div>
+        <div class="venue-header">
+          <div class="venue-name">Piedra Cafe-Lounge Bar</div>
+          <div class="venue-rating">★★★★</div>
+        </div>
+        <div class="venue-meta">Edge of Old Town · Outdoor · Views over Paphos + sea</div>
+        <div class="venue-body">Cocktail and shisha bar with a genuine view over Paphos and out to sea. Good for sundowners before dinner when someone decides the group should do something slightly classy. They are correct. Stay an hour, then eat.</div>
+        <div class="venue-verdict">The 6:30pm decision that makes the evening start well.</div>
+      </div>
+
+      <div class="venue-card">
+        <div class="card-tag tag-gray">Late night chaos — optional</div>
+        <div class="venue-header">
+          <div class="venue-name">Bar Street (Agiou Antoniou)</div>
+          <div class="venue-rating">★★★</div>
+        </div>
+        <div class="venue-meta">Kato Paphos · British-friendly · Loud · You know what this is</div>
+        <div class="venue-body">The main strip. Catering enthusiastically to British tourists since before most of you would care to admit. Karaoke. DJs. Sticky floors. Use sparingly — once or twice, for the football overflow or the night someone decides the group needs to go "somewhere with a proper atmosphere." They are not wrong. They are also not right.</div>
+        <div class="venue-verdict">Two visits maximum. You'll get one good story and one very clear reason to stop.</div>
+      </div>
+
+    </div>
+
+    <div class="sub-panel" id="sub-zones">
+      <div class="card">
+        <div class="card-tag tag-gold">Default</div>
+        <div class="card-title">The Harbour</div>
+        <div class="card-body">Where most evenings start and many end. Food, drinks, walkability, sea views, and enough bars that nobody has to commit to a plan. The group gravitates here naturally even when attempting to decide somewhere else. Go with it.</div>
+      </div>
+      <div class="card">
+        <div class="card-tag tag-sea">The smart night</div>
+        <div class="card-title">Paphos Old Town</div>
+        <div class="card-body">Wine bars, cocktail bars, good restaurants, stone-walled everything. Go here when someone suggests "something a bit different tonight." They are right. The Old Town rewards the effort and is only a short taxi from the harbour. Rum & Jam, Ambience, Piedra, Mandra Tavern — it's all here.</div>
+      </div>
+      <div class="card">
+        <div class="card-tag tag-terr">Limited exposure</div>
+        <div class="card-title">Bar Street</div>
+        <div class="card-body">Formally: Agiou Antoniou Street. Informally: where Keg & Barrel is, where the football goes, where the night occasionally ends up. Fine in controlled doses. Not a lifestyle.</div>
+      </div>
+      <div class="rule-block"><p>Nicosia: too far. Ayia Napa: wrong demographic energy. Larnaca: low payoff. Limassol: yes, once — marina lunch, walking, drinks, return same day. That's the full day trip list.</p></div>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="section" id="section-map">
+    <div class="section-label">On the ground</div>
+    <div class="section-title">The map</div>
+    <div class="prose">Every venue worth knowing. Tap a card to open in Google Maps with directions. 7 St. Georges is out in Yeroskipou — that's why it needs a taxi.</div>
+    <div class="section-label" style="margin-top:0.5rem;">Quick reference</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;">
+
+      <a href="https://www.google.com/maps/search/7+St+Georges+Tavern+Yeroskipou+Paphos+Cyprus" target="_blank" style="text-decoration:none;">
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:0.75rem;">
+          <div style="font-size:10px;font-weight:600;color:var(--cy-gold);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Book first</div>
+          <div style="font-size:13px;font-weight:500;color:var(--ink);">7 St. Georges Tavern</div>
+          <div style="font-size:11px;color:var(--hint);margin-top:2px;">Yeroskipou · taxi needed</div>
+          <div style="font-size:11px;color:var(--cy-terr);margin-top:4px;">Closed Mon · opens 7pm</div>
+        </div>
+      </a>
+
+      <a href="https://www.google.com/maps/search/Laona+Restaurant+Paphos+Cyprus" target="_blank" style="text-decoration:none;">
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:0.75rem;">
+          <div style="font-size:10px;font-weight:600;color:var(--cy-gold);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Old Town</div>
+          <div style="font-size:13px;font-weight:500;color:var(--ink);">Laona Restaurant</div>
+          <div style="font-size:11px;color:var(--hint);margin-top:2px;">Old Town · walkable</div>
+          <div style="font-size:11px;color:var(--cy-terr);margin-top:4px;">Closed Sun · lunch + Fri/Tue eve</div>
+        </div>
+      </a>
+
+      <a href="https://www.google.com/maps/search/Mandra+Tavern+Paphos+Cyprus" target="_blank" style="text-decoration:none;">
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:0.75rem;">
+          <div style="font-size:10px;font-weight:600;color:var(--cy-gold);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Old Town</div>
+          <div style="font-size:13px;font-weight:500;color:var(--ink);">Mandra Tavern</div>
+          <div style="font-size:11px;color:var(--hint);margin-top:2px;">Old Town · walkable</div>
+          <div style="font-size:11px;color:var(--cy-terr);margin-top:4px;">Dinner only · 6–11pm daily</div>
+        </div>
+      </a>
+
+      <a href="https://www.google.com/maps/search/To+Eklekton+Cypriot+Corner+Paphos+Cyprus" target="_blank" style="text-decoration:none;">
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:0.75rem;">
+          <div style="font-size:10px;font-weight:600;color:var(--cy-gold);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Late night</div>
+          <div style="font-size:13px;font-weight:500;color:var(--ink);">To Eklekton</div>
+          <div style="font-size:11px;color:var(--hint);margin-top:2px;">Kato Paphos · short walk</div>
+          <div style="font-size:11px;color:var(--cy-terr);margin-top:4px;">Open until 2am daily</div>
+        </div>
+      </a>
+
+      <a href="https://www.google.com/maps/search/Keg+and+Barrel+Paphos+Cyprus" target="_blank" style="text-decoration:none;">
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:0.75rem;">
+          <div style="font-size:10px;font-weight:600;color:var(--cy-sea);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Match HQ</div>
+          <div style="font-size:13px;font-weight:500;color:var(--ink);">Keg &amp; Barrel</div>
+          <div style="font-size:11px;color:var(--hint);margin-top:2px;">Bar Street · walkable</div>
+          <div style="font-size:11px;color:var(--cy-terr);margin-top:4px;">Noon–midnight daily</div>
+        </div>
+      </a>
+
+      <a href="https://www.google.com/maps/search/Rum+and+Jam+Paphos+Cyprus" target="_blank" style="text-decoration:none;">
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:0.75rem;">
+          <div style="font-size:10px;font-weight:600;color:var(--cy-sea);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Cocktails</div>
+          <div style="font-size:13px;font-weight:500;color:var(--ink);">Rum &amp; Jam</div>
+          <div style="font-size:11px;color:var(--hint);margin-top:2px;">Old Town alley · walkable</div>
+          <div style="font-size:11px;color:var(--cy-terr);margin-top:4px;">Open until 1:30–2am</div>
+        </div>
+      </a>
+
+      <a href="https://www.google.com/maps/search/Ambience+Gin+House+Paphos+Cyprus" target="_blank" style="text-decoration:none;">
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:0.75rem;">
+          <div style="font-size:10px;font-weight:600;color:var(--cy-sea);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">200 gins</div>
+          <div style="font-size:13px;font-weight:500;color:var(--ink);">Ambience Gin House</div>
+          <div style="font-size:11px;color:var(--hint);margin-top:2px;">Old Town · walkable</div>
+          <div style="font-size:11px;color:var(--cy-terr);margin-top:4px;">Check hours on arrival</div>
+        </div>
+      </a>
+
+      <a href="https://www.google.com/maps/search/Piedra+Lounge+Bar+Paphos+Cyprus" target="_blank" style="text-decoration:none;">
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:0.75rem;">
+          <div style="font-size:10px;font-weight:600;color:var(--cy-sea);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Sundowners</div>
+          <div style="font-size:13px;font-weight:500;color:var(--ink);">Piedra Lounge Bar</div>
+          <div style="font-size:11px;color:var(--hint);margin-top:2px;">Old Town · walkable</div>
+          <div style="font-size:11px;color:var(--cy-terr);margin-top:4px;">Closed Monday</div>
+        </div>
+      </a>
+
+      <a href="https://www.google.com/maps/@34.7577749,32.4119601,18z" target="_blank" style="text-decoration:none;">
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:0.75rem;">
+          <div style="font-size:10px;font-weight:600;color:var(--cy-gold);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Since 1951</div>
+          <div style="font-size:13px;font-weight:500;color:var(--ink);">Hondros Tavern</div>
+          <div style="font-size:11px;color:var(--hint);margin-top:2px;">Near harbour · walkable</div>
+          <div style="font-size:11px;color:var(--cy-terr);margin-top:4px;">Noon–10:30pm daily</div>
+        </div>
+      </a>
+
+      <a href="https://www.google.com/maps/@34.7862843,32.4502464,18z" target="_blank" style="text-decoration:none;">
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:0.75rem;">
+          <div style="font-size:10px;font-weight:600;color:var(--cy-gold);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Fri & Sat only</div>
+          <div style="font-size:13px;font-weight:500;color:var(--ink);">Konia Tavern</div>
+          <div style="font-size:11px;color:var(--hint);margin-top:2px;">Konia village · 10 min taxi</div>
+          <div style="font-size:11px;color:var(--cy-terr);margin-top:4px;">Live music Fri & Sat · Closed Sun</div>
+        </div>
+      </a>
+
+    </div>
+    <div class="rule-block">
+      <p>Hondros and the harbour-area venues are all walkable. 7 St. Georges and Konia Tavern need taxis — split nine ways, it's nothing. Konia on a Friday or Saturday with the live band is worth every minute of the ride.</p>
+    </div>
+  </div>
+
+  <!-- FOOTBALL -->
+  <div class="section" id="section-football">
+    <div class="section-label">Structural anchor</div>
+    <div class="section-title">Football</div>
+    <div class="prose">Football is not entertainment on this trip. It is the <em>organisational framework</em>. Everything else works around it.</div>
+    <div class="card"><div class="card-tag tag-gold">Home base</div><div class="card-title">Keg & Barrel</div><div class="card-body">Default match venue. Multiple screens, good beer, seating that becomes strategic the moment anyone sits down. Arrive before the match starts. This is not optional.</div></div>
+    <div class="card"><div class="card-tag tag-gold">Home base</div><div class="card-title">Harry O's</div><div class="card-body">Backup. Not a downgrade. Sometimes preferred. The group will develop a position on this by Day 3.</div></div>
+    <hr class="divider">
+    <div class="card"><div class="card-title">Tactical analysis</div><div class="card-body">Increases in precision after the second beer. By the third, the manager is wrong. By the fourth, you'd have won it 3–0 with a completely different system that is explained at length.</div></div>
+    <div class="card"><div class="card-title">The referee</div><div class="card-body">Universally corrupt. This is agreed upon regardless of which team benefits from any given decision. Consistency is the one thing the group manages efficiently.</div></div>
+    <div class="card"><div class="card-title">Seating</div><div class="card-body">Strategic from the moment the group walks in. Whoever arrives first establishes position. Moving mid-match is not done. If the screen angle is wrong, this is mentioned, not resolved.</div></div>
+    <hr class="divider">
+    <div class="rule-block"><p>If a match conflicts with a dinner reservation, the match takes precedence. The reservation is "adjusted." Everyone knew this when they made it.</p></div>
+  </div>
+
+  <!-- PHRASEBOOK -->
+  <div class="section" id="section-phrases">
+    <div class="section-label">Greek Cypriot</div>
+    <div class="section-title">Phrasebook</div>
+    <div class="prose">Real phrases. Accurate usage. British pronunciations — as in, how you'd actually say it after three pints rather than how a language app would have you say it. Tap each card for the full story.</div>
+
+    <div class="phrase-card" onclick="togglePhrase(this)">
+      <div class="phrase-greek">Γεια μας</div>
+      <div class="phrase-phonetic">YA mas</div>
+      <div class="phrase-brit">Rhymes with "car jazz" but shorter. Just say "ya mas" and mean it.</div>
+      <div class="phrase-meaning">Cheers / To us</div>
+      <div class="phrase-detail">
+        Literal: "To our health." Used at every glass, every round, every time someone arrives at the table. Cannot be overused. The locals use it constantly and will warm to you immediately for trying.<br><br>
+        Works for: toasts, arrivals, filling silences, acknowledging someone's round. Basically: whenever you'd raise a glass.
+        <div class="phrase-safe">Use constantly. Zero risk of getting this wrong.</div>
+      </div>
+    </div>
+
+    <div class="phrase-card" onclick="togglePhrase(this)">
+      <div class="phrase-greek">Άλλη μια μπύρα παρακαλώ</div>
+      <div class="phrase-phonetic">AL-ee MIA BEE-ra para-ka-LO</div>
+      <div class="phrase-brit">Say it like: "Alley mia beera, para-ca-lo." Stress the BEE. Do not stress the rest.</div>
+      <div class="phrase-meaning">Another beer please</div>
+      <div class="phrase-detail">
+        The full version — useful on Day 1 when you're still trying. By Day 3, "AL-ee mia" with a raised finger does the job. By Day 5, eye contact alone is sufficient. The bar staff adapt to your level of ambition faster than you do.<br><br>
+        Advanced version: hold up however many fingers. "Tres" (TREH-ss) for three. They know.
+        <div class="phrase-safe">Attempt the full version at least once. The effort is appreciated.</div>
+      </div>
+    </div>
+
+    <div class="phrase-card" onclick="togglePhrase(this)">
+      <div class="phrase-greek">Πάμε</div>
+      <div class="phrase-phonetic">PA-meh</div>
+      <div class="phrase-brit">Like "Pammy" without the second syllable. Quick. Decisive.</div>
+      <div class="phrase-meaning">Let's go / Come on</div>
+      <div class="phrase-detail">
+        Universal motivator. Used for: taxis, extracting someone from a bar, football rallying, getting the group off sunbeds, general impatience with the pace of a decision-making process.<br><br>
+        You'll hear it from locals during matches too — especially directed at players who are taking too long to do something obvious. You will understand exactly what it means.
+        <div class="phrase-safe">Low risk. High utility. Use freely.</div>
+      </div>
+    </div>
+
+    <div class="phrase-card" onclick="togglePhrase(this)">
+      <div class="phrase-greek">Ευχαριστώ</div>
+      <div class="phrase-phonetic">ef-ha-ri-STO</div>
+      <div class="phrase-brit">Think "eff-harry-STO". The "eff" is soft. Don't overthink it. Just say it.</div>
+      <div class="phrase-meaning">Thank you</div>
+      <div class="phrase-detail">
+        Basic. Essential. Universally well-received. Say it every time food arrives, which in Cyprus is frequently and in larger quantities than expected.<br><br>
+        Locals notice the effort immediately and it costs you absolutely nothing. Most tourists don't bother. You're not most tourists.
+        <div class="phrase-safe">Say it every time. No exceptions.</div>
+      </div>
+    </div>
+
+    <div class="phrase-card" onclick="togglePhrase(this)">
+      <div class="phrase-greek">Σιγά σιγά</div>
+      <div class="phrase-phonetic">see-GA see-GA</div>
+      <div class="phrase-brit">Like "see-GAH see-GAH". Two identical syllables. Languid. Don't rush it — that would defeat the point.</div>
+      <div class="phrase-meaning">Slowly, slowly — relax, no rush</div>
+      <div class="phrase-detail">
+        The Cypriot national philosophy expressed in four syllables. Means: there is no urgency, you are rushing for no reason, another drink will appear, the problem will resolve itself or simply stop being a problem — which is functionally the same thing.<br><br>
+        If you hear it directed at you by a local, it means you are behaving like someone who has forgotten they're on holiday. Stop it.<br><br>
+        The group should adopt this as its operating system by Day 3.
+        <div class="phrase-safe">Use on anyone who's being unnecessarily stressed. Including yourself.</div>
+      </div>
+    </div>
+
+    <div class="phrase-card" onclick="togglePhrase(this)">
+      <div class="phrase-greek">Μαλάκας</div>
+      <div class="phrase-phonetic">ma-LA-kas</div>
+      <div class="phrase-brit">Stress the LA. Short, sharp. "Ma-LA-kas." Not "MAL-akas." The stress is important because you'll hear it said correctly constantly and want to match it.</div>
+      <div class="phrase-meaning">Wanker / mate / you absolute idiot (depends entirely on tone)</div>
+      <div class="phrase-detail">
+        Literal meaning: wanker. Real-world usage: Cyprus's most flexible word. Tone is everything.<br><br>
+        <strong>Warm + grinning</strong> → "you legend, you complete and utter legend"<br>
+        <strong>Flat + sighing</strong> → "you idiot, I can't believe you just did that"<br>
+        <strong>Sharp + standing up</strong> → don't use it on this person right now<br><br>
+        Cypriots use it as punctuation — between friends, constantly, with complete affection. You will hear it directed at the TV during matches, at waiters by other waiters, at friends greeting each other across the street.<br><br>
+        Between your group: completely fine once the trip finds its feet. Directed at locals you've just met: hold off until you're reading the room accurately.
+        <div class="phrase-warning">Tone is everything. Warm delivery only until you know the person.</div>
+      </div>
+    </div>
+
+    <div class="phrase-card" onclick="togglePhrase(this)">
+      <div class="phrase-greek">Γαμώτο</div>
+      <div class="phrase-phonetic">gha-MO-to</div>
+      <div class="phrase-brit">The "gh" is a soft growl at the back of the throat — not quite a G, not quite an H. Think of the Scottish "loch" but voiced. Then "MO-to". Practice quietly before deploying.</div>
+      <div class="phrase-meaning">For fuck's sake / bloody hell</div>
+      <div class="phrase-detail">
+        General-purpose expletive. The go-to when something has gone wrong that didn't need to go wrong. Safe, widely understood, and proportionate.<br><br>
+        Perfect for:<br>
+        — A goal conceded in the 89th minute<br>
+        — A referee decision of staggering ineptitude<br>
+        — Someone ordering the wrong thing for the table<br>
+        — Anyone suggesting a long walk at 11pm<br>
+        — The taxi that was supposed to be here 15 minutes ago<br><br>
+        Not directed at people. Used about situations. This distinction matters.
+        <div class="phrase-warning">Sporting contexts only. Never at staff, never at locals.</div>
+      </div>
+    </div>
+
+    <div class="phrase-card" onclick="togglePhrase(this)">
+      <div class="phrase-greek">Άντε γαμήσου</div>
+      <div class="phrase-phonetic">AN-deh gha-MEE-soo</div>
+      <div class="phrase-brit">Phonetically manageable. Conceptually: a hand grenade. Read the room before even attempting it.</div>
+      <div class="phrase-meaning">Go fuck yourself</div>
+      <div class="phrase-detail">
+        Not a greeting. Not a joke for bar staff. Not something to test on locals to see if they laugh. They may laugh. That does not mean it was a good idea.<br><br>
+        Acceptable contexts:<br>
+        — Said to a close friend who has just done something you find genuinely impressive and/or outrageous<br>
+        — Muttered quietly at the television when a match takes a turn<br>
+        — Read aloud in the villa as a pronunciation exercise that goes no further<br><br>
+        If you're considering using it with someone you met two hours ago: don't.
+        <div class="phrase-warning">Not for public use. Not for staff. Not for testing. Not for fun.</div>
+      </div>
+    </div>
+
+    <div class="phrase-card" onclick="togglePhrase(this)">
+      <div class="phrase-greek">Πού είναι η τουαλέτα;</div>
+      <div class="phrase-phonetic">POO EE-neh ee too-ah-LEH-ta</div>
+      <div class="phrase-brit">"Poo ee-neh ee too-ah-LEH-ta." Yes, it starts with "poo." Maintain composure. This is adult travel.</div>
+      <div class="phrase-meaning">Where is the toilet?</div>
+      <div class="phrase-detail">
+        More useful than it sounds. Cyprus is a civilised country with accessible facilities, but in older tavernas and village restaurants things can be tucked away. Worth knowing.<br><br>
+        Alternative approach: look for a man who works there and use a facial expression. This also works. But the phrase is better.
+        <div class="phrase-safe">Opens with "poo." Power through. This is necessary.</div>
+      </div>
+    </div>
+
+    <div class="phrase-card" onclick="togglePhrase(this)">
+      <div class="phrase-greek">Λογαριασμό παρακαλώ</div>
+      <div class="phrase-phonetic">lo-gha-ree-az-MO para-ka-LO</div>
+      <div class="phrase-brit">"Lo-garee-az-MO, para-ca-lo." Slightly long. Worth knowing because miming signing a bill starts to feel undignified by Day 4.</div>
+      <div class="phrase-meaning">The bill, please</div>
+      <div class="phrase-detail">
+        Useful. Dignified. Saves the awkward mime-signing routine that everyone does and nobody enjoys. Also: Cypriot restaurants do not rush you. You will need to ask. They are operating on σιγά σιγά time.<br><br>
+        Once you've said it, the bill will arrive in three to eight minutes. This is normal. Order one more drink.
+        <div class="phrase-safe">Use it. It's what the phrase was invented for.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ARCHETYPES -->
+  <div class="section" id="section-archetypes">
+    <div class="section-label">Group dynamics</div>
+    <div class="section-title">The nine archetypes</div>
+    <div class="prose">Every group of nine British men on holiday contains all of these. Identification usually takes until Day 2, though some reveal themselves at the airport.</div>
+    <div class="archetype"><div class="arch-role">The Researcher</div><div class="arch-name">Has read everything</div><div class="arch-body">Arrives with a spreadsheet, three restaurant recommendations with TripAdvisor rankings, a preferred jeep safari operator, and opinions about the microclimate in June. Has done more preparation than is necessary for a week of sitting by a pool. Is usually right about the restaurants.</div><div class="arch-quote">"I looked this place up — actually, the one two streets over has better ratings and the kleftiko is apparently outstanding."</div></div>
+    <div class="archetype"><div class="arch-role">The Decisive One</div><div class="arch-name">Always suggests something immediately</div><div class="arch-body">Names the first restaurant within 30 seconds of the question being asked. Gets overruled. Forty minutes later, the group ends up exactly where he suggested. He does not say anything. He does not need to.</div><div class="arch-quote">"What about that place by the harbour?" [every night, from Day 1]</div></div>
+    <div class="archetype"><div class="arch-role">The Flexible One</div><div class="arch-name">Genuinely open to anything</div><div class="arch-body">Says "I'm easy" with complete sincerity. Will quietly veto three options before anything is agreed. This is not obstruction — it is genuine preference avoidance, which turns out to have identical practical consequences.</div><div class="arch-quote">"Whatever everyone else wants. I genuinely don't mind."</div></div>
+    <div class="archetype"><div class="arch-role">The Logistics Captain</div><div class="arch-name">Knows where everyone is</div><div class="arch-body">Books the taxi. Counts heads before leaving. Quietly texts the straggler. Receives no credit, which he expects. Essential to everything working, which he also knows. The trip collapses without him and nobody realises until Day 4.</div><div class="arch-quote">"Right, shall we go? Where's [name]? Is he still at the bar?"</div></div>
+    <div class="archetype"><div class="arch-role">The Tactician</div><div class="arch-name">Football expert, post-beer edition</div><div class="arch-body">Analysis sharpens after the second drink. Formation opinions harden after the third. By the fourth, the manager is not just wrong but arguably negligent and possibly in breach of his contractual obligations. Could have won this in the first half.</div><div class="arch-quote">"If they'd pressed higher from the start, this doesn't happen. It's basic."</div></div>
+    <div class="archetype"><div class="arch-role">The Moderate</div><div class="arch-name">Definitely not drinking tonight</div><div class="arch-body">States this clearly at 11am with full conviction. Is drinking by 6:30pm, somehow. Does not acknowledge the contradiction. Nobody brings it up. This is the correct social response and shows the group at its best.</div><div class="arch-quote">"I'm just having the one. Early night for me. I mean it this time."</div></div>
+    <div class="archetype"><div class="arch-role">The Optimist</div><div class="arch-name">Already planning the next one</div><div class="arch-body">Says "we should do this every year" on Day 3. Says it again on Day 5. On Day 7 it becomes a formal proposal with provisional dates. Has said this before. The next trip is always being discussed before anyone has landed home.</div><div class="arch-quote">"Genuinely though — same time next year? Greece? Sardinia? Open to discussion."</div></div>
+    <div class="archetype"><div class="arch-role">The Quiet Expert</div><div class="arch-name">Knows things without announcing it</div><div class="arch-body">Orders something in broken Greek and it works. Finds the local wine that costs half the price and tastes better. Asks the waiter something quiet that results in a better table. Says nothing about any of this. It simply happens around him.</div><div class="arch-quote">[To waiter, quietly, in a combination of Greek and gestures that somehow works perfectly]</div></div>
+    <div class="archetype"><div class="arch-role">The Wild Card</div><div class="arch-name">Still going at 3am. Fine at breakfast.</div><div class="arch-body">Completely normal at dinner. Completely normal at the first bar. Normal through midnight. Appears at the villa pool at 8am having "not really slept, to be honest." Functional. Slightly alarming. Manages the jeep trip without complaint. Nobody fully understands this and nobody asks.</div><div class="arch-quote">"I feel great, actually. I think the heat suits me."</div></div>
+  </div>
+
+  <!-- DECIDER -->
+  <div class="section" id="section-decide">
+    <div class="section-label">Group decision support</div>
+    <div class="section-title">The Decider</div>
+    <div class="prose">For when the group has been discussing it for 20 minutes. Pick your situation. A verdict will be issued.</div>
+    <div class="decision-wrap">
+      <div class="decision-q">What is the group currently failing to decide?</div>
+      <div class="decision-options">
+        <button class="decision-opt" onclick="decide('dinner')">Where to eat tonight</button>
+        <button class="decision-opt" onclick="decide('bar')">Which bar to go to</button>
+        <button class="decision-opt" onclick="decide('beach')">Beach or pool today</button>
+        <button class="decision-opt" onclick="decide('trip')">Whether to do Limassol</button>
+        <button class="decision-opt" onclick="decide('home')">Time to head back</button>
+        <button class="decision-opt" onclick="decide('order')">What to order</button>
+      </div>
+      <div class="decision-output" id="decision-output">Select a situation above. A verdict will be issued without sentiment.</div>
+    </div>
+    <div class="rule-block"><p>The Decider operates on one principle: the answer was known within 30 seconds of the question being asked. The intervening time is democracy. The outcome is inevitable.</p></div>
+  </div>
+
+  <div class="footer">
+    Paphos 2026 · Nine men. One villa. No excuses.<br>
+    Σιγά σιγά.
+  </div>
+</div>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('section-' + id).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+  function showDay(n) {
+    document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('day-' + n).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+  function showSubPanel(id) {
+    document.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('sub-' + id).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+  function togglePhrase(el) {
+    const wasOpen = el.classList.contains('open');
+    document.querySelectorAll('.phrase-card').forEach(c => c.classList.remove('open'));
+    if (!wasOpen) el.classList.add('open');
+  }
+  const decisions = {
+    dinner: [
+      "7 St. Georges Tavern — if you haven't been yet. No menu. No wine list. Twenty dishes. Taxi to Yeroskipou. Book before you leave the villa.",
+      "The harbour. It was always going to be the harbour. Three alternative suggestions were aired. None were superior. Go to the harbour.",
+      "Laona in the Old Town. The Decisive One suggested it forty minutes ago. He was right then. He is still right. Go.",
+      "Ask the Quiet Expert. He already knows. He's just waiting to be consulted."
+    ],
+    bar: [
+      "Keg & Barrel. There is or isn't a match on. Either way, it's the correct default. The seating is known. The beer is cold. Nothing to debate.",
+      "Rum & Jam in the Old Town. Cocktail bar down an alleyway. Smaller than expected. Better than it sounds. Worth the taxi.",
+      "Start at the harbour, see where the evening goes. This is not a plan. It is, however, what will happen regardless of any other decision made right now.",
+      "The bar you all liked two nights ago. Everyone knows which one. Nobody's said it because it seemed too obvious. It isn't. Go there."
+    ],
+    beach: [
+      "Pool. It's 33 degrees. The pool is right there. The walk to Coral Bay involves a car, which involves someone driving, which involves coffee and twenty minutes. Stay at the pool.",
+      "Coral Bay. Leave now — before 10am — or the sunbeds are gone and the argument about sunbeds will be worse than this one.",
+      "Pool this morning. Beach after lunch if anyone still wants to. Nobody will, but the option existing is enough."
+    ],
+    trip: [
+      "Go. One hour forty minutes each way. Marina lunch. Walk. Drinks. Back by 6pm. It's the right trip and the right distance.",
+      "Not today. The villa is working. Limassol will keep. Wait for the day when nobody's particularly comfortable where they are. It will arrive.",
+      "Yes. Tomorrow or Day 5. Not today — the meze from last night requires a lower-ambition morning."
+    ],
+    home: [
+      "Now. You've said 'one more' twice. The next one is the same decision with worse consequences. Go home, drink water.",
+      "Twenty minutes. Someone needs to locate the Wild Card. He is fine. He is always fine.",
+      "You already know the answer. You're asking to confirm it. Confirmed. Go."
+    ],
+    order: [
+      "Meze. Stop reading the menu. You will end up at meze. The menu is a formality that Cyprus maintains out of politeness.",
+      "Whatever the table next to you is having. It looks better than anything you've found. The waiter will know what it is.",
+      "Ask the waiter what's good today. Accept the first answer without qualification. Do not add dietary caveats that nobody mentioned until now."
+    ]
+  };
+  function decide(type) {
+    const opts = decisions[type];
+    document.getElementById('decision-output').textContent = opts[Math.floor(Math.random() * opts.length)];
+  }
+</script>
+</body>
+</html>
